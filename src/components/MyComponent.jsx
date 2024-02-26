@@ -1,13 +1,12 @@
-import React, { Component } from "react";
+import React, { Component, createRef } from "react";
 
 class ChildComponent extends Component {
   render() {
-    const { stringProp, numberProp } = this.props;
+    const { stringProp } = this.props;
     return (
       <div>
         <p>
-          prop from parent: <br /> string {stringProp} <br />
-          number {numberProp}
+          prop from parent: <br /> {stringProp}
         </p>
       </div>
     );
@@ -19,8 +18,9 @@ class MyComponent extends Component {
     super(props);
     this.state = {
       inputValueString: "",
-      inputValueNumber: 0,
+      isDisabled: false,
     };
+    this.inputRef = createRef();
     console.log("constructor called");
   }
 
@@ -38,15 +38,17 @@ class MyComponent extends Component {
 
   handleInputChange = (event) => {
     this.setState({ inputValueString: event.target.value });
-  };
-
-  handleInputNumberChange = (event) => {
-    this.setState({ inputValueNumber: event.target.value });
+    event.target.value === `реакт`
+      ? this.setState({ isDisabled: true })
+      : this.setState({ isDisabled: false });
   };
 
   handleButtonClick = () => {
     console.log("input value string: ", this.state.inputValueString);
-    console.log("input value number: ", this.state.inputValueNumber);
+  };
+
+  handleButtonFocus = () => {
+    this.inputRef.current.focus();
   };
 
   render() {
@@ -60,31 +62,25 @@ class MyComponent extends Component {
               type="text"
               value={this.state.inputValueString}
               onChange={this.handleInputChange}
+              ref={this.inputRef}
             />
           </label>
 
           <br />
 
-          <label>
-            Input number:
-            <input
-              type="number"
-              value={this.state.inputValueNumber}
-              onChange={this.handleInputNumberChange}
-            />
-          </label>
-
-          <br />
-
-          <button type="button" onClick={this.handleButtonClick}>
+          <button
+            type="button"
+            onClick={this.handleButtonClick}
+            disabled={this.state.isDisabled}
+          >
             show value in console
+          </button>
+          <button type="button" onClick={this.handleButtonFocus}>
+            focus on input
           </button>
         </form>
 
-        <ChildComponent
-          stringProp={this.state.inputValueString}
-          numberProp={this.state.inputValueNumber}
-        />
+        <ChildComponent stringProp={this.state.inputValueString} />
       </div>
     );
   }
